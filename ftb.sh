@@ -23,7 +23,7 @@ send_fail_message()
 start()
 {
     echo "Starting server $1."
-    screen -d -m -S $1 /home/minecraft/$1/start.sh
+    screen -d -m -S $1 /home/minecraft/$1/ServerStart.sh
     sleep 10
     check_running $1
     response=$?
