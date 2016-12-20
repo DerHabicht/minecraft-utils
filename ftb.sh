@@ -17,7 +17,7 @@ send_fail_message()
         fail_message+="\n\nA restart was attempted, but failed."
     fi
 
-    echo -e $fail_message | sendmail robert@the-hawk.us
+    echo "$fail_message"
 }
 
 start()
@@ -40,7 +40,24 @@ start()
 
 stop()
 {
+    if [ "$2" == 1 ]
+    then
+        operation="restarting"
+    else
+        operation="shutting down"
+    fi
+
+    countdown=70
+
+    while [ $countdown -gt 10 ]
+    do
+        echo "Stopping in $((countdown -= 10)) seconds..."
+        screen -S $1 -X stuff "say Server is $operation in $countdown seconds...\n"
+        sleep 10
+    done
+
     echo "Stopping server $1"
+
     screen -S $1 -X stuff ^C
     sleep 10
     check_running $1
@@ -81,7 +98,7 @@ console()
 
 restart()
 {
-    stop $1
+    stop $1 1
     start $1
 }
 
@@ -91,7 +108,7 @@ then
     repsonse=$?
 elif [ "$2" == "stop" ]
 then
-    stop $1
+    stop $1 0
     repsonse=$?
 elif [ "$2" == "status" ]
 then
