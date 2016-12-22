@@ -47,13 +47,22 @@ stop()
         operation="shutting down"
     fi
 
-    countdown=70
-
-    while [ $countdown -gt 10 ]
+    countdown=5
+    while [ $countdown -gt 1 ]
     do
-        echo "Stopping in $((countdown -= 10)) seconds..."
+        echo "Stopping in $countdown minutes.."
+        screen -S $1 -X stuff "say Server is $operation in $countdown minutes..\n"
+        echo $((countdown-=1)) > /dev/null
+        sleep 60
+    done
+
+    countdown=60
+    while [ $countdown -gt 0 ]
+    do
+        echo "Stopping in $countdown seconds..."
         screen -S $1 -X stuff "say Server is $operation in $countdown seconds...\n"
-        sleep 10
+        echo $((countdown-=1)) > /dev/null
+        sleep 60
     done
 
     echo "Stopping server $1"
