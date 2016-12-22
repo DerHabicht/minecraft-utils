@@ -50,8 +50,8 @@ stop()
     countdown=5
     while [ $countdown -gt 1 ]
     do
-        echo "Stopping in $countdown minutes.."
-        screen -S $1 -X stuff "say Server is $operation in $countdown minutes..\n"
+        echo "Stopping in $countdown minutes..."
+        screen -S $1 -X stuff "say Server is $operation in $countdown minutes...\n"
         echo $((countdown-=1)) > /dev/null
         sleep 60
     done
@@ -61,8 +61,8 @@ stop()
     do
         echo "Stopping in $countdown seconds..."
         screen -S $1 -X stuff "say Server is $operation in $countdown seconds...\n"
-        echo $((countdown-=1)) > /dev/null
-        sleep 60
+        echo $((countdown-=10)) > /dev/null
+        sleep 10
     done
 
     echo "Stopping server $1"
