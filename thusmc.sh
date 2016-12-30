@@ -7,17 +7,16 @@ check_running()
 
 send_fail_message()
 {
-    fail_message="Subject: Server failure $2\n\n"
     fail_message+="The $2 server was found to not be running on "
     fail_message+=$(date "+%F at %T").
     if [ "$1" == 0 ]
     then
-        fail_message+="\n\nThe server was successfully restarted."
+        fail_message+="\nThe server was successfully restarted.\n"
     else
-        fail_message+="\n\nA restart was attempted, but failed."
+        fail_message+="\nA restart was attempted, but failed.\n"
     fi
 
-    echo "$fail_message"
+    printf "$fail_message"
 }
 
 start()
