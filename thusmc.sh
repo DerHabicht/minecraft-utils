@@ -22,14 +22,34 @@ send_fail_message()
 
 start()
 {
-    echo "Starting server $1."
+    if [ "$2" == 1 ]
+    then
+        echo "Starting server $1 with IRC..."
+    else
+        echo "Starting server $1 without IRC..."
+    fi
     screen -d -m -S $1 /home/minecraft/$1/ServerStart.sh
-    sleep 10
+
+    countdown=5
+    while [ $countdown -gt 0 ]
+    do
+        echo "Waiting for server to finish starting ($countdown min)..."
+        echo $((countdown-=1)) > /dev/null
+        sleep 60
+    done
+
     check_running $1
     response=$?
 
     if [ "$response" == 0 ]
     then
+        if [ "$2" == 1 ]
+        then
+            echo "Attempting to connect to IRC..."
+            screen -S $1 -X stuff "thump service irc sendraw thus_irc PRIVMSG NickServ IDENTIFY MaulisAureaIsLove!\n"
+            sleep 5
+            screen -S $1 -X stuff "thump service irc sendraw thus_irc JOIN #Minecraft\n"
+        fi
         echo "Server started."
     else
         echo "Server failed to start. Check the logs."
@@ -65,7 +85,7 @@ stop()
         sleep 10
     done
 
-    echo "Stopping server $1"
+    echo "Stopping server $1..."
 
     screen -S $1 -X stuff ^C
     sleep 10
@@ -108,13 +128,19 @@ console()
 restart()
 {
     stop $1 1
-    start $1
+    start $1 $2
 }
 
 if [ "$2" == "start" ]
 then
-    start $1
-    repsonse=$?
+    if [ "$3" == "--irc" ]
+    then
+        start $1 1
+        repsonse=$?
+    else
+        start $1 0
+        repsonse=$?
+    fi
 elif [ "$2" == "stop" ]
 then
     stop $1 0
@@ -129,8 +155,15 @@ then
     repsonse=$?
 elif [ "$2" == "restart" ]
 then
-    restart $1
-    response=$?
+    if [ "$3" == "--irc" ]
+    then
+        restart $1 1
+        response=$?
+    else
+        restart $1 0
+        response=$?
+    fi
+
 elif [ "$2" == "checkrun" ]
 then
     check_running $1
