@@ -169,7 +169,13 @@ then
     check_running $1
     if [ "$?" == 1 ]
     then
-        start $1
+        if [ "$3" == 1 ]
+        then
+            start $1 1
+        else
+            start $1 0
+        fi
+
         if [ "$?" == 0 ]
         then
             send_fail_message 0 $1
