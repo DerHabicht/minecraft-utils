@@ -19,6 +19,15 @@ send_fail_message()
     printf "$fail_message"
 }
 
+irc()
+{
+    source "$HOME/.config/thusmc/ircpass.sh"
+    echo "Attempting to connect to IRC on $1..."
+    screen -S $1 -X stuff "thump service irc sendraw thus_irc PRIVMSG NickServ IDENTIFY $MCIRCPASS\n"
+    sleep 5
+    screen -S $1 -X stuff "thump service irc sendraw thus_irc JOIN #Minecraft\n"
+}
+
 start()
 {
     if [ "$2" == 1 ]
@@ -44,10 +53,7 @@ start()
     then
         if [ "$2" == 1 ]
         then
-            echo "Attempting to connect to IRC..."
-            screen -S $1 -X stuff "thump service irc sendraw thus_irc PRIVMSG NickServ IDENTIFY MaulisAureaIsLove!\n"
-            sleep 5
-            screen -S $1 -X stuff "thump service irc sendraw thus_irc JOIN #Minecraft\n"
+            irc $1
         fi
         echo "Server started."
     else
@@ -168,7 +174,7 @@ then
     check_running $1
     if [ "$?" == 1 ]
     then
-        if [ "$3" == 1 ]
+        if [ "$3" == "--irc" ]
         then
             start $1 1
         else
@@ -182,6 +188,9 @@ then
             send_fail_message 1 $1
         fi
     fi
+elif [ "$2" == "irc" ]
+then
+    irc $1
 fi
 
 exit $response
