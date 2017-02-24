@@ -12,19 +12,31 @@ unregister_server() {
 if [ "$1" == "enable" ]
 then
     register_server "$2"
-    mc "$2" start --irc
+    /home/minecraft/bin/mc "$2" start --irc
 elif [ "$1" == "disable" ]
 then
-    mc "$2" stop
+    /home/minecraft/bin/mc "$2" stop
     unregister_server "$2"
 elif [ "$1" == "checkrun" ]
 then
     while IFS= read -r line
     do
-        mc "$line" checkrun --irc
+        /home/minecraft/bin/mc "$line" checkrun --irc
+    done < $registry
+elif [ "$1" == "restart" ]
+then
+    while IFS= read -r line
+    do
+        /home/minecraft/bin/mc "$line" restart --irc
     done < $registry
 elif [ "$1" == "active" ]
 then
     cat $registry
+elif [ "status" ]
+then
+    while IFS= read -r line
+    do
+        /home/minecraft/bin/mc "$line" status
+    done < $registry
 fi
 
