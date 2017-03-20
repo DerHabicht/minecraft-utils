@@ -32,16 +32,26 @@ start()
 {
     if [ "$2" == 1 ]
     then
-        echo "Starting server $1 with IRC..."
+        if [ "$3" != "false" ]
+        then
+            echo "Starting server $1 with IRC..."
+        fi
     else
-        echo "Starting server $1 without IRC..."
+        if [ "$3" != "false" ]
+        then
+            echo "Starting server $1 without IRC..."
+        fi
     fi
     screen -d -m -S $1 /home/minecraft/$1/ServerStart.sh
 
     countdown=5
     while [ $countdown -gt 0 ]
     do
-        echo "Waiting for server to finish starting ($countdown min)..."
+        if [ "$3" != "false" ]
+        then
+            echo "Waiting for server to finish starting ($countdown min)..."
+        fi
+
         echo $((countdown-=1)) > /dev/null
         sleep 60
     done
@@ -55,7 +65,11 @@ start()
         then
             irc $1
         fi
-        echo "Server started."
+
+        if [ "$3" != "false" ]
+        then
+            echo "Server started."
+        fi
     else
         echo "Server failed to start. Check the logs."
     fi
@@ -75,7 +89,10 @@ stop()
     countdown=5
     while [ $countdown -gt 1 ]
     do
-        echo "Stopping in $countdown minutes..."
+        if [ "$3" != "false" ]
+        then
+            echo "Stopping in $countdown minutes..."
+        fi
         screen -S $1 -X stuff "say Server is $operation in $countdown minutes...\n"
         echo $((countdown-=1)) > /dev/null
         sleep 60
@@ -84,13 +101,19 @@ stop()
     countdown=60
     while [ $countdown -gt 0 ]
     do
-        echo "Stopping in $countdown seconds..."
+        if [ "$3" != "false" ]
+        then
+            echo "Stopping in $countdown seconds..."
+        fi
         screen -S $1 -X stuff "say Server is $operation in $countdown seconds...\n"
         echo $((countdown-=10)) > /dev/null
         sleep 10
     done
 
-    echo "Stopping server $1..."
+    if [ "$3" != "false" ]
+    then
+        echo "Stopping server $1..."
+    fi
 
     screen -S $1 -X stuff ^C
     sleep 10
@@ -99,7 +122,10 @@ stop()
 
     if [ "$response" == 1 ]
     then
-        echo "Server stopped."
+        if [ "$3" != "false" ]
+        then
+            echo "Server stopped."
+        fi
         repsonse=0
     else
         echo "Server failed to stop. Check the console."
@@ -138,12 +164,12 @@ restart()
 
 if [ "$2" == "start" ]
 then
-    if [ "$3" == "--irc" ]
+    if [ "$3" == "--silent" ]
     then
-        start $1 1
+        start $1 1 "false"
         repsonse=$?
     else
-        start $1 0
+        start $1 1 "true"
         repsonse=$?
     fi
 elif [ "$2" == "stop" ]
@@ -160,12 +186,12 @@ then
     repsonse=$?
 elif [ "$2" == "restart" ]
 then
-    if [ "$3" == "--irc" ]
+    if [ "$3" == "--silent" ]
     then
-        restart $1 1
+        restart $1 1 "false"
         response=$?
     else
-        restart $1 0
+        restart $1 1 "true"
         response=$?
     fi
 
@@ -174,11 +200,11 @@ then
     check_running $1
     if [ "$?" == 1 ]
     then
-        if [ "$3" == "--irc" ]
+        if [ "$3" == "--silent" ]
         then
-            start $1 1
+            start $1 1 "false"
         else
-            start $1 0
+            start $1 1 "true"
         fi
 
         if [ "$?" == 0 ]
