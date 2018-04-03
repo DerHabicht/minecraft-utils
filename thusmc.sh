@@ -5,20 +5,6 @@ check_running()
     return $?
 }
 
-send_fail_message()
-{
-    fail_message+="The $2 server was found to not be running on "
-    fail_message+=$(date "+%F at %T").
-    if [ "$1" == 0 ]
-    then
-        fail_message+="\nThe server was successfully restarted.\n"
-    else
-        fail_message+="\nA restart was attempted, but failed.\n"
-    fi
-
-    printf "$fail_message"
-}
-
 irc()
 {
     source "$HOME/.config/thusmc/ircpass.sh"
@@ -200,6 +186,14 @@ then
     check_running $1
     if [ "$?" == 1 ]
     then
+        fail="The $1 server was found to not be running on "
+        fail+=$(date "+%F at %T")
+        printf "$fail"
+        printf ".\nThe latest log follows."
+        printf "\n\n-------------------------------------------------------------------------------\n\n"
+        cat /home/minecraft/$1/logs/latest.log
+        printf "\n\n-------------------------------------------------------------------------------\n\n"
+
         if [ "$3" == "--silent" ]
         then
             start $1 1 "false"
@@ -209,9 +203,9 @@ then
 
         if [ "$?" == 0 ]
         then
-            send_fail_message 0 $1
+            printf "The server was successfully restarted."
         else
-            send_fail_message 1 $1
+            printf "A restart was attempted, but failed."
         fi
     fi
 elif [ "$2" == "irc" ]

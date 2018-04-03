@@ -32,11 +32,19 @@ then
 elif [ "$1" == "active" ]
 then
     cat $registry
-elif [ "status" ]
+elif [ "$1" == "status" ]
 then
     while IFS= read -r line
     do
         /home/minecraft/bin/mc "$line" status
     done < $registry
+else
+    echo "Commands:"
+    echo "  active"
+    echo "  checkrun"
+    echo "  disable {SERVER}"
+    echo "  enable {SERVER}"
+    echo "  restart"
+    echo "  status"
 fi
 
